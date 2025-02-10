@@ -1,13 +1,28 @@
-# github_testing
+# GitHub Testing  
 
+## Setup Instructions  
 
+### 1. Generate a GitHub API Token  
+To authenticate correctly with the GitHub API, follow these steps:  
 
-1 - To get the token for correct authentification of the GITHUB API, go to :
-https://github.com/settings/tokens
-2 - Generate a new token with (classic) option, general use
-3- Select repo and users checkbox
-4 - Save it and copy it in a .env file (saved in the root) as GITHUB_TOKEN = xxxxxxxx
-5 - PIp install -r requirements.txt
+1. Go to [GitHub Personal Access Tokens](https://github.com/settings/tokens).  
+2. Click **"Generate new token"** (select the **Classic** option for general use).  
+3. Select the **repo** and **user** scopes.  
+4. Generate the token and copy it.  
+5. Create a `.env` file in the project root and add:  
+   ```plaintext
+   GITHUB_TOKEN=your_generated_token
 
+### 2. Install dependencies
+Run the following command to install the required dependencies:
+   ```plaintext
+   pip install -r requirements.txt
+   ```
 
-the json schemas are retrieved from the official github api documentation https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28
+### API Schema
+The JSON schemas used in this project are based on the official GitHub API documentation:
+https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28
+
+### Important Notes 
+1. There is a rate limit for unauthenticated API requests. Don't run the unauthenticated tests a lot of times or you will get eventually a 403
+2. Store your .env file securely and do not commit it to version control.

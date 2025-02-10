@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Dict
 
+# Parent class: UserProfile
 @dataclass
 class UserProfile:
     login: str
@@ -36,3 +37,15 @@ class UserProfile:
     following: int
     created_at: str
     updated_at: str
+
+@dataclass
+class AuthorizedUserProfile(UserProfile):
+    # Private fields (only available when authenticated)
+    private_gists: Optional[int] = None
+    total_private_repos: Optional[int] = None
+    owned_private_repos: Optional[int] = None
+    disk_usage: Optional[int] = None
+    collaborators: Optional[int] = None
+    two_factor_authentication: Optional[bool] = None
+    plan: Optional[Dict] = None  # The 'plan' field is an object, so use dict
+    notification_email: Optional[str] = None
