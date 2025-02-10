@@ -1,0 +1,4 @@
+requests
+pytest
+jsonschema
+allure-pytest
