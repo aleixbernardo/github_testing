@@ -8,24 +8,14 @@ import requests
 BASE_URL = "https://api.github.com/"
 
 
-def get_user_profile(username: str):
-    """ Get the public profile of a username """
-    url = f"{BASE_URL}/users/{username}"
-    response = requests.get(url)
-    allure.attach(str(response.status_code), name="Status Code", attachment_type=allure.attachment_type.TEXT)
-    allure.attach(response.text, name="Response Body", attachment_type=allure.attachment_type.JSON)
-
-
-    return response
-
-
-def get_user_profile_authenticated(username: str):
+def get_user_profile(username: str, include_token=True):
     """ Get the public profile of a username using the github personal access token saved in .env file"""
-    github_token = os.getenv('GITHUB_TOKEN')
-    if not github_token:
-        raise ValueError("GITHUB_TOKEN is missing! Please set it in the .env file.")
-
-    headers = {"Authorization": f"token {github_token}"}
+    headers = {}
+    if include_token:
+        github_token = os.getenv('GITHUB_TOKEN')
+        if not github_token:
+            raise ValueError("GITHUB_TOKEN is missing! Please set it in the .env file.")
+        headers = {"Authorization": f"token {github_token}"}
     url = f"{BASE_URL}/users/{username}"
     response = requests.get(url, headers=headers)
     allure.attach(str(response.status_code), name="Status Code", attachment_type=allure.attachment_type.TEXT)

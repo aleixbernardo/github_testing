@@ -6,7 +6,7 @@ import pytest
 from error_messages.messages import ErrorMessages
 from models.user_model import UserProfile, AuthorizedUserProfile
 from schemas.user_schema import USER_PROFILE_SCHEMA, NEGATIVE_RESPONSE_SCHEMA
-from utils.api_users import get_user_profile, get_user_profile_authenticated, get_logged_user_profile, \
+from utils.api_users import get_logged_user_profile, \
     update_user_profile
 from utils.schema_validator import validate_json_schema
 

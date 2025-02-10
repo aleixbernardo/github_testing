@@ -6,7 +6,7 @@ import pytest
 from error_messages.messages import ErrorMessages
 from models.user_model import AuthorizedUserProfile, UserProfile
 from schemas.user_schema import USER_PROFILE_SCHEMA, NEGATIVE_RESPONSE_SCHEMA
-from utils.api_users import get_user_profile, get_user_profile_authenticated
+from utils.api_users import get_user_profile
 from utils.schema_validator import validate_json_schema
 
 
@@ -14,12 +14,10 @@ from utils.schema_validator import validate_json_schema
 @pytest.mark.smoke
 def test_get_user_profile_existing_users_non_authorized_user(username):
     with allure.step(f"Send GET request to fetch user profile for '{username}'"):
-        response = get_user_profile(username)
+        response = get_user_profile(username, include_token=False)
 
     with allure.step("Validate the HTTP status code is 200"):
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-
-    
 
     with allure.step("Validate JSON schema of the response"):
         data = response.json()
@@ -40,12 +38,11 @@ def test_get_user_profile_existing_users_non_authorized_user(username):
 def test_get_user_same_profile_as_token_requested():
     with allure.step(
             "Send GET request to fetch user profile for aleixbernardo with the authorization matching the aleixbernardo"):
-        response = get_user_profile_authenticated("aleixbernardo")
+        response = get_user_profile("aleixbernardo")
 
     with allure.step("Validate the HTTP status code is 200"):
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
-    
 
     with allure.step("Validate JSON schema of the response"):
         data = response.json()
@@ -56,8 +53,6 @@ def test_get_user_same_profile_as_token_requested():
         user_profile = AuthorizedUserProfile(**data)
         allure.attach(str(user_profile), name="UserProfile Object", attachment_type=allure.attachment_type.TEXT)
 
-
-        # Verify that the 'login' field matches the provided username (ignoring case)
         assert user_profile.login.lower() == "aleixbernardo", (
             f"Expected login to be aleixbernardo, but got {user_profile.login}"
         )
