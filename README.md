@@ -47,6 +47,5 @@ personal github token as parameter.
 2. Store your .env file securely and do not commit it to version control.
 
 ### Comments
-
-During the testing development, I realised that there are some erors in the status code responses for some endpoints,
-the ones that are actually failing
+1. During the testing development, I realised that there are some erors in the status code responses for some endpoints, and some erors in the date filtering.
+2. Parametrization has not been implemented because the list of tests is small, and the API responses are fast, making it unnecessary.
