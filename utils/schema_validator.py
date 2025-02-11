@@ -21,6 +21,7 @@ from typing import Type, TypeVar, Dict, Any
 
 T = TypeVar("T")
 
+
 def from_dict(data: Dict[str, Any], dataclass_type: Type[T]) -> T:
     """Recursively converts a dictionary into a dataclass instance."""
     if not isinstance(data, dict):
@@ -33,7 +34,11 @@ def from_dict(data: Dict[str, Any], dataclass_type: Type[T]) -> T:
             field_type = field_types[key]
 
             # Handle lists of dataclasses
-            if isinstance(value, list) and hasattr(field_type, "__origin__") and field_type.__origin__ == list:
+            if (
+                isinstance(value, list)
+                and hasattr(field_type, "__origin__")
+                and field_type.__origin__ == list
+            ):
                 inner_type = field_type.__args__[0]  # Extract the list element type
                 if is_dataclass(inner_type):
                     data[key] = [from_dict(item, inner_type) for item in value]

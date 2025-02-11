@@ -48,13 +48,14 @@ def test_get_own_personal_profile_contains_expected_fields():
         assert user_profile.two_factor_authentication is False
         assert user_profile.plan["name"] == "free"
 
+
 @pytest.mark.security
 def test_get_own_personal_no_token_attached():
     with allure.step(f"Send GET request to fetch the personal profile without token"):
         response = get_logged_user_profile(include_token=False)
 
     with allure.step("Validate the HTTP status code is 401 unauthorized"):
-        assert response.status_code == 401, f"Expected 200, got {response.status_code}"
+        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
 
     with allure.step(
         "Validate JSON schema of the response, that contains one more field called notification email"
@@ -82,7 +83,6 @@ def test_get_own_personal_incorrect_token():
 
     with allure.step("Check error message is the expected"):
         assert data["message"] == ErrorMessages.INVALID_CREDENTIALS
-
 
 
 @pytest.mark.performance

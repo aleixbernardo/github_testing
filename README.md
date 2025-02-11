@@ -34,6 +34,12 @@ https://akshay-jain.medium.com/pycharm-black-with-formatting-on-auto-save-479797
 The JSON schemas used in this project are based on the official GitHub API documentation:
 https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28
 
+### Pipeline
+
+Pipeline is found in https://github.com/aleixbernardo/github_testing/actions to trigger manually with the
+personal github token as parameter.
+
+
 ### Important Notes
 
 1. There is a rate limit for unauthenticated API requests. Don't run the unauthenticated tests a lot of times or you

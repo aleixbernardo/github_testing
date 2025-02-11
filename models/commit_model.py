@@ -9,6 +9,7 @@ class Tree:
     url: str
     sha: str
 
+
 @dataclass
 class Verification:
     verified: bool
@@ -17,11 +18,13 @@ class Verification:
     payload: Optional[str]
     verified_at: Optional[str]
 
+
 @dataclass
 class CommitInfo:
     name: str
     email: str
     date: str
+
 
 @dataclass
 class Commit:
@@ -33,11 +36,13 @@ class Commit:
     comment_count: int
     verification: Verification
 
+
 @dataclass
 class Parent:
     url: str
     html_url: str
     sha: str
+
 
 @dataclass
 class CommitDetail:

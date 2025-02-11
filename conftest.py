@@ -33,7 +33,15 @@ def reset_github_profile_attributes():
     test in which we update the attributes
     """
     logging.info("Resetting the aleixbernardo attributes")
-    update_user_profile({"name": "aleix", "blog": "aleix.bernardo@blog.com", "twitter_username": "aleix_twitter",
-                         "company": "Bizerba", "location": "Badalona", "bio": "this is the bio of aleix"})
+    update_user_profile(
+        {
+            "name": "aleix",
+            "blog": "aleix.bernardo@blog.com",
+            "twitter_username": "aleix_twitter",
+            "company": "Bizerba",
+            "location": "Badalona",
+            "bio": "this is the bio of aleix",
+        }
+    )
 
     yield
