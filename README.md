@@ -22,6 +22,15 @@ Run the following command to install the required dependencies:
    pip install -r requirements.txt
    ```
 
+### Reporting
+
+After each test run, a fresh new folder is generated in  the root folder called allure-results with all test data, steps and screenshots,
+thanks to the pytest ini configuration.
+To see the allure report in local, just run
+```plaintext
+   allure serve allure-results
+   ```
+
 ### Code Formatting
 
 The formatting library chosen for this project is black ( installed in requirements.txt)
