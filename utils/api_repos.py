@@ -8,14 +8,16 @@ import requests
 BASE_URL = "https://api.github.com"
 
 
-def get_repositories_from_user(username: str, type: str = "owner",
-                               sort: str = "full_name",
-                               direction: str = None,
-                               per_page: int = 30,
-                               page: int = 1,
-                               include_token=True,
-                               random_token=False,
-                               ):
+def get_repositories_from_user(
+    username: str,
+    type: str = "owner",
+    sort: str = "full_name",
+    direction: str = None,
+    per_page: int = 30,
+    page: int = 1,
+    include_token=True,
+    random_token=False,
+):
     """
     Lists public repositories for the specified user, paginated.
 
@@ -30,22 +32,19 @@ def get_repositories_from_user(username: str, type: str = "owner",
     if include_token:
         if random_token:
             # Generate a random token for testing purposes (e.g., a random string of 40 characters)
-            github_token = ''.join(random.choices(string.ascii_letters + string.digits, k=40))
+            github_token = "".join(
+                random.choices(string.ascii_letters + string.digits, k=40)
+            )
         else:
             # Retrieve token from environment variables
-            github_token = os.getenv('GITHUB_TOKEN')
+            github_token = os.getenv("GITHUB_TOKEN")
 
         if not github_token:
             raise ValueError("GITHUB_TOKEN is missing! Please set it in the .env file.")
 
         headers = {"Authorization": f"token {github_token}"}
 
-    params = {
-        "type": type,
-        "sort": sort,
-        "per_page": per_page,
-        "page": page
-    }
+    params = {"type": type, "sort": sort, "per_page": per_page, "page": page}
 
     if direction:
         params["direction"] = direction
@@ -56,26 +55,33 @@ def get_repositories_from_user(username: str, type: str = "owner",
 
     url = f"{BASE_URL}/users/{username}/repos"
     response = requests.get(url, params=params, headers=headers)
-    allure.attach(str(response.status_code), name="Status Code", attachment_type=allure.attachment_type.TEXT)
-    allure.attach(response.text, name="Response Body", attachment_type=allure.attachment_type.JSON)
+    allure.attach(
+        str(response.status_code),
+        name="Status Code",
+        attachment_type=allure.attachment_type.TEXT,
+    )
+    allure.attach(
+        response.text, name="Response Body", attachment_type=allure.attachment_type.JSON
+    )
     return response
 
 
-def get_repositories_from_logged_user(type: str = "all",  # Type filter for repositories (default: all)
-                                      sort: str = "full_name",  # Sorting criteria (default: full_name)
-                                      direction: str = None,  # Sorting order (default: asc for full_name)
-                                      per_page: int = 30,  # Results per page (default: 30)
-                                      page: int = 1,  # Page number (default: 1)
-                                      visibility: str = None,
-                                      affiliation: str = None,
-                                      # Affiliation filter (default: owner,collaborator,organization_member)
-                                      include_token: bool = True,  # Include GitHub token in the request
-                                      random_token: bool = False,  # Whether to generate a random token for testing
-                                      since: str = None,
-                                      # Only show repositories updated after the given time (ISO 8601 format)
-                                      before: str = None
-                                      # Only show repositories updated before the given time (ISO 8601 format)
-                                      ):
+def get_repositories_from_logged_user(
+    type: str = "all",  # Type filter for repositories (default: all)
+    sort: str = "full_name",  # Sorting criteria (default: full_name)
+    direction: str = None,  # Sorting order (default: asc for full_name)
+    per_page: int = 30,  # Results per page (default: 30)
+    page: int = 1,  # Page number (default: 1)
+    visibility: str = None,
+    affiliation: str = None,
+    # Affiliation filter (default: owner,collaborator,organization_member)
+    include_token: bool = True,  # Include GitHub token in the request
+    random_token: bool = False,  # Whether to generate a random token for testing
+    since: str = None,
+    # Only show repositories updated after the given time (ISO 8601 format)
+    before: str = None,
+    # Only show repositories updated before the given time (ISO 8601 format)
+):
     """
     Lists public repositories for the specified user, paginated with enhanced filters.
 
@@ -96,10 +102,12 @@ def get_repositories_from_logged_user(type: str = "all",  # Type filter for repo
     if include_token:
         if random_token:
             # Generate a random token for testing purposes (e.g., a random string of 40 characters)
-            github_token = ''.join(random.choices(string.ascii_letters + string.digits, k=40))
+            github_token = "".join(
+                random.choices(string.ascii_letters + string.digits, k=40)
+            )
         else:
             # Retrieve token from environment variables
-            github_token = os.getenv('GITHUB_TOKEN')
+            github_token = os.getenv("GITHUB_TOKEN")
 
         if not github_token:
             raise ValueError("GITHUB_TOKEN is missing! Please set it in the .env file.")
@@ -115,7 +123,7 @@ def get_repositories_from_logged_user(type: str = "all",  # Type filter for repo
         "visibility": visibility,
         "affiliation": affiliation,
         "since": since,
-        "before": before
+        "before": before,
     }
 
     # Filter out any None values from the params dictionary
@@ -136,7 +144,100 @@ def get_repositories_from_logged_user(type: str = "all",  # Type filter for repo
     response = requests.get(url, params=params, headers=headers)
 
     # Attach the response details to Allure for visibility
-    allure.attach(str(response.status_code), name="Status Code", attachment_type=allure.attachment_type.TEXT)
-    allure.attach(response.text, name="Response Body", attachment_type=allure.attachment_type.JSON)
+    allure.attach(
+        str(response.status_code),
+        name="Status Code",
+        attachment_type=allure.attachment_type.TEXT,
+    )
+    allure.attach(
+        response.text, name="Response Body", attachment_type=allure.attachment_type.JSON
+    )
+
+    return response
+
+
+def get_commits_of_repository(
+    owner: str,
+    repo: str,
+    sha: str = None,
+    path: str = None,
+    author: str = None,
+    committer: str = None,
+    since: str = None,
+    until: str = None,
+    per_page: int = 30,
+    page: int = 1,
+    include_token: bool = True,
+    random_token: bool = False,
+):
+    """
+    Fetches the list of commits for a given repository.
+
+    Parameters:
+    - owner (str): Repository owner username (case-insensitive).
+    - repo (str): Repository name without `.git` extension (case-insensitive).
+    - sha (str, optional): SHA or branch to start listing commits from. Default: repository's default branch.
+    - path (str, optional): Filter commits that modify a specific file/directory.
+    - author (str, optional): GitHub username or email address to filter by commit author.
+    - committer (str, optional): GitHub username or email address to filter by commit committer.
+    - since (str, optional): Show commits after this timestamp (ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ).
+    - until (str, optional): Show commits before this timestamp (ISO 8601 format: YYYY-MM-DDTHH:MM:SSZ).
+    - per_page (int, optional): Number of commits per page (max 100). Default is 30.
+    - page (int, optional): Page number for pagination. Default is 1.
+    - include_token (bool, optional): Whether to include the authentication token in the request.
+    - random_token ( bool, optional):  # Whether to generate a random token for testing
+
+    Returns:
+    - Response object from the API request.
+    """
+
+    # Prepare headers
+    headers = {}
+
+    if include_token:
+        if random_token:
+            # Generate a random token for testing purposes (e.g., a random string of 40 characters)
+            github_token = "".join(
+                random.choices(string.ascii_letters + string.digits, k=40)
+            )
+        else:
+            # Retrieve token from environment variables
+            github_token = os.getenv("GITHUB_TOKEN")
+        if not github_token:
+            raise ValueError("GITHUB_TOKEN is missing! Please set it in the .env file.")
+        headers["Authorization"] = f"Bearer {github_token}"
+
+    # Set query parameters, filtering out None values
+    params = {
+        "sha": sha,
+        "path": path,
+        "author": author,
+        "committer": committer,
+        "since": since,
+        "until": until,
+        "per_page": per_page,
+        "page": page,
+    }
+    params = {
+        key: value for key, value in params.items() if value is not None
+    }  # Remove None values
+
+    # Construct the API endpoint
+    url = f"{BASE_URL}/repos/{owner}/{repo}/commits"
+
+    with allure.step(f"Sending GET request to fetch commits for {owner}/{repo}"):
+        response = requests.get(url, params=params, headers=headers)
+
+    with allure.step("Attach API response details to Allure"):
+        allure.attach(
+            str(response.status_code),
+            name="Status Code",
+            attachment_type=allure.attachment_type.TEXT,
+        )
+        allure.attach(
+            response.text,
+            name="Response Body",
+            attachment_type=allure.attachment_type.JSON,
+        )
 
     return response

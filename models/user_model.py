@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Dict
 
+
 # Parent class: UserProfile
 @dataclass
 class UserProfile:
@@ -37,6 +38,7 @@ class UserProfile:
     following: int
     created_at: str
     updated_at: str
+
 
 @dataclass
 class AuthorizedUserProfile(UserProfile):

@@ -7,4 +7,6 @@ class ErrorMessages:
     NOT_FOUND = "Not Found"
 
     # Combination Errors
-    INVALID_VISIBILITY_AFFILIATION_TYPE_COMBINATION =  "If you specify visibility or affiliation, you cannot specify type."
+    INVALID_VISIBILITY_AFFILIATION_TYPE_COMBINATION = (
+        "If you specify visibility or affiliation, you cannot specify type."
+    )
