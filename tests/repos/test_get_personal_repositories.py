@@ -13,7 +13,7 @@ from models.user_model import AuthorizedUserProfile, UserProfile
 from schemas.repos_schema import LIST_REPOSITORIES_SCHEMA
 from schemas.user_schema import USER_PROFILE_SCHEMA, NEGATIVE_RESPONSE_SCHEMA
 from utils.api_repos import get_repositories_from_logged_user
-from utils.schema_validator import validate_json_schema
+from utils.schema_validator import validate_json_schema, from_dict
 
 
 @pytest.mark.smoke
@@ -173,7 +173,7 @@ def test_get_personal_repositories_with_type_filter(type_value, description):
         validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
 
     with allure.step(
         f"Validate that repositories are filtered by type '{type_value}' ({description})"
@@ -185,17 +185,17 @@ def test_get_personal_repositories_with_type_filter(type_value, description):
             assert len(repo_objects) == 9
         elif type_value == "owner":
             assert all(
-                repo.owner["login"] == "aleixbernardo" for repo in repo_objects
+                repo.owner.login == "aleixbernardo" for repo in repo_objects
             ), f"Not all repositories are owned by 'octocat' for filter '{type_value}'"
             assert len(repo_objects) == 5
         elif type_value == "member":
             # For the 'member' type, check if the repository is not owned by him
-            assert all(repo.owner["login"] == "mbernardo95" for repo in repo_objects)
+            assert all(repo.owner.login == "mbernardo95" for repo in repo_objects)
             assert len(repo_objects) == 4
 
         elif type_value == "public":
             # For the 'member' type, check if the repository is not owned by him
-            assert all(repo.owner["login"] == "aleixbernardo" for repo in repo_objects)
+            assert all(repo.owner.login == "aleixbernardo" for repo in repo_objects)
             assert len(repo_objects) == 1
             assert repo_objects[0].full_name == "aleixbernardo/github_testing"
 
@@ -234,7 +234,7 @@ def test_get_personal_repositories_with_visibility_filter(
         validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
 
     with allure.step(
         f"Validate that repositories are filtered by type '{visibility_value}' ({description})"
@@ -242,7 +242,7 @@ def test_get_personal_repositories_with_visibility_filter(
         # Implement logic here to check if the repositories match the 'type' filter
         if visibility_value == "public":
             # For the 'member' type, check if the repository is not owned by him
-            assert all(repo.owner["login"] == "aleixbernardo" for repo in repo_objects)
+            assert all(repo.owner.login == "aleixbernardo" for repo in repo_objects)
             assert len(repo_objects) == 1
             assert repo_objects[0].full_name == "aleixbernardo/github_testing"
 
@@ -283,7 +283,7 @@ def test_get_personal_repositories_with_affiliation_filter(
         validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
 
     with allure.step(
         f"Validate that repositories are filtered by affiliation_value '{affiliation_value}' ({description})"
@@ -291,12 +291,12 @@ def test_get_personal_repositories_with_affiliation_filter(
         # Implement logic here to check if the repositories match the 'type' filter
         if affiliation_value == "owner":
             # For the 'member' type, check if the repository is not owned by him
-            assert all(repo.owner["login"] == "aleixbernardo" for repo in repo_objects)
+            assert all(repo.owner.login == "aleixbernardo" for repo in repo_objects)
             assert len(repo_objects) == 5
 
         elif affiliation_value == "collaborator":
             # For the 'member' type, check if the repository is not owned by him
-            assert all(repo.owner["login"] == "mbernardo95" for repo in repo_objects)
+            assert all(repo.owner.login == "mbernardo95" for repo in repo_objects)
             assert len(repo_objects) == 4
         else:
             assert len(repo_objects) == 0
@@ -365,7 +365,7 @@ def test_get_personal_repositories_since_filter(since_value, number_repos):
         data = response.json()
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
         assert len(repo_objects) == number_repos
 
     with allure.step("Check all dates are after the since value"):
@@ -402,7 +402,7 @@ def test_get_personal_repositories_before_filter(before_value, number_repos):
         data = response.json()
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
         assert len(repo_objects) == number_repos
 
     with allure.step("Check all dates are after the since value"):

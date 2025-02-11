@@ -5,7 +5,7 @@ import string
 import allure
 import requests
 
-BASE_URL = "https://api.github.com/"
+BASE_URL = "https://api.github.com"
 
 
 def get_user_profile(username: str, include_token=True):

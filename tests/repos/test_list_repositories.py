@@ -7,56 +7,60 @@ import pytest
 from error_messages.messages import ErrorMessages
 from models.repo_model import Repository
 from models.user_model import AuthorizedUserProfile, UserProfile
-from schemas.commits_schema import LIST_COMMITS_SCHEMA
 from schemas.repos_schema import LIST_REPOSITORIES_SCHEMA
 from schemas.user_schema import USER_PROFILE_SCHEMA, NEGATIVE_RESPONSE_SCHEMA
-from utils.api_repos import get_repositories_from_user, get_commits_of_repository
-from utils.schema_validator import validate_json_schema
+from utils.api_repos import get_repositories_from_user
+from utils.schema_validator import validate_json_schema, from_dict
 
 
-@pytest.mark.parametrize("repo_name", ["hello-world", "boysenberry-repo-1"])
+@pytest.mark.parametrize("username", ["octocat", "aleixbernardo"])
 @pytest.mark.smoke
-def test_get_list_of_commits_of_octocat_contains_expected_fields(repo_name):
-    with allure.step(f"Send GET request to fetch all the commits for repo'{repo_name}' for user octocat"):
-        response = get_commits_of_repository(owner='octocat', repo=repo_name)
-
-    with allure.step("Validate the HTTP status code is 200"):
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-
-    with allure.step("Validate JSON schema of the response contains all the data"):
-        data = response.json()
-        validate_json_schema(data, LIST_COMMITS_SCHEMA)
-
-    with allure.step("Double check the needed keys"):
-        for commit in data:
-            assert "sha" in commit.keys()
-            assert "author" in commit["commit"].keys()
-            assert "message" in commit["commit"].keys()
-            assert "date" in commit["commit"]["committer"].keys()
-
-
-
-@pytest.mark.parametrize("repo_name", ["hello-world", "boysenberry-repo-1"])
-@pytest.mark.security
-def test_test_get_list_of_commits_of_octocat_without_authorization(repo_name):
-    with allure.step(f"Send GET request to fetch all the commits for repo'{repo_name}' for user octocat without authorization"):
-        response = get_commits_of_repository(owner='octocat', repo=repo_name, include_token=False)
+def test_get_public_repositories_of_user_contains_expected_fields(username):
+    with allure.step(f"Send GET request to fetch user profile for '{username}'"):
+        response = get_repositories_from_user(username)
 
     with allure.step("Validate the HTTP status code is 200"):
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
     with allure.step("Validate JSON schema of the response"):
         data = response.json()
-        validate_json_schema(data, LIST_COMMITS_SCHEMA)
+        validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
-@pytest.mark.parametrize("repo_name", ["hello-world", "boysenberry-repo-1"])
+
+@pytest.mark.parametrize("username", ["octocat", "aleixbernardo"])
 @pytest.mark.security
-def test_get_list_of_commits_invalid_credentials(repo_name):
-    with allure.step(f"Send GET request to fetch all the commits for repo'{repo_name}' for user octocat without authorization"):
-        response = get_commits_of_repository(owner='octocat', repo=repo_name, include_token=True, random_token=True)
+def test_get_public_repositories_of_user_with_and_without_authorization(username):
+    with allure.step(f"Send GET request to fetch user profile for '{username}'"):
+        response = get_repositories_from_user(username)
+
+    with allure.step("Validate the HTTP status code is 200"):
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+    with allure.step("Validate JSON schema of the response"):
+        data = response.json()
+        print(data)
+        validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
+
+    with allure.step(
+        f"Send GET request to fetch user profile for '{username}' without authorization"
+    ):
+        response = get_repositories_from_user(username, include_token=False)
+
+    with allure.step("Validate the HTTP status code is 200"):
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+
+    with allure.step("Validate JSON schema of the response"):
+        data = response.json()
+        validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
+
+
+@pytest.mark.security
+def test_get_public_repositories_of_user_invalid_credentials():
+    with allure.step("Send GET request to fetch user profile for aleixbernardo"):
+        response = get_repositories_from_user("aleixbernardo", random_token=True)
 
     with allure.step("Validate the HTTP status code is 401 unauthorized"):
-        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
+        assert response.status_code == 401, f"Expected 200, got {response.status_code}"
 
     with allure.step(
         "Validate JSON schema of the response, that contains one more field called notification email"
@@ -66,7 +70,6 @@ def test_get_list_of_commits_invalid_credentials(repo_name):
 
     with allure.step("Check error message is the expected"):
         assert data["message"] == ErrorMessages.INVALID_CREDENTIALS
-
 
 
 def test_get_public_repositories_of_user_only_1_repo():
@@ -84,7 +87,7 @@ def test_get_public_repositories_of_user_only_1_repo():
         assert len(data) == 1
 
     with allure.step("Convert JSON response to list of Repo object and verify data"):
-        repo_object = Repository(**data[0])
+        repo_object = from_dict(data[0], Repository)
         allure.attach(
             str(repo_object),
             name="UserProfile Object",
@@ -92,7 +95,7 @@ def test_get_public_repositories_of_user_only_1_repo():
         )
 
         assert repo_object.full_name == "aleixbernardo/github_testing"
-        assert repo_object.owner["login"] == "aleixbernardo"
+        assert repo_object.owner.login == "aleixbernardo"
 
 
 test_cases = [
@@ -158,7 +161,7 @@ def test_get_public_repositories_of_user_octocat_sorting(sort, direction):
         validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
 
     with allure.step(
         f"Check that repositories are sorted by {sort} in {direction} order"
@@ -206,7 +209,7 @@ def test_get_repositories_with_type_filter(type_value, description):
         validate_json_schema(data, LIST_REPOSITORIES_SCHEMA)
 
     with allure.step(f"Convert JSON response to list of Repo objects"):
-        repo_objects = [Repository(**repo) for repo in data]
+        repo_objects = [from_dict(repo, Repository) for repo in data]
 
     with allure.step(
         f"Validate that repositories are filtered by type '{type_value}' ({description})"
@@ -214,13 +217,13 @@ def test_get_repositories_with_type_filter(type_value, description):
         # Implement logic here to check if the repositories match the 'type' filter
         if type_value == "owner":
             assert all(
-                repo.owner["login"] == "octocat" for repo in repo_objects
+                repo.owner.login == "octocat" for repo in repo_objects
             ), f"Not all repositories are owned by 'octocat' for filter '{type_value}'"
             assert len(repo_objects) == 8
         elif type_value == "member":
             # For the 'member' type, check if the repository is not owned by him
             assert not any(
-                repo.owner["login"] == "octocat" for repo in repo_objects
+                repo.owner.login == "octocat" for repo in repo_objects
             ), f"Not all repositories are owned by 'octocat' for filter '{type_value}'"
             assert len(repo_objects) == 50
         elif type_value == "all":

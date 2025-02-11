@@ -2,14 +2,12 @@ from dataclasses import dataclass
 from typing import Optional, Dict
 
 
-# Parent class: UserProfile
 @dataclass
 class UserProfile:
     login: str
     id: int
     node_id: str
     avatar_url: str
-    gravatar_id: Optional[str]  # Can be an empty string
     url: str
     html_url: str
     followers_url: str
@@ -24,20 +22,21 @@ class UserProfile:
     type: str
     user_view_type: str  # Newly added field
     site_admin: bool
-    name: Optional[str]
-    company: Optional[str]
-    blog: Optional[str]  # Can be an empty string
-    location: Optional[str]
-    email: Optional[str]
-    hireable: Optional[bool]
-    bio: Optional[str]
-    twitter_username: Optional[str]
-    public_repos: int
-    public_gists: int
-    followers: int
-    following: int
-    created_at: str
-    updated_at: str
+    gravatar_id: Optional[str] = None  # Can be an empty string
+    name: Optional[str] = None
+    company: Optional[str] = None
+    blog: Optional[str] = None  # Can be an empty string
+    location: Optional[str] = None
+    email: Optional[str] = None
+    hireable: Optional[bool] = None
+    bio: Optional[str] = None
+    twitter_username: Optional[str] = None
+    public_repos: int = 0
+    public_gists: int = 0
+    followers: int = 0
+    following: int = 0
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None  # Add default for missing field
 
 
 @dataclass

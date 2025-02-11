@@ -39,3 +39,8 @@ https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28
 1. There is a rate limit for unauthenticated API requests. Don't run the unauthenticated tests a lot of times or you
    will get eventually a 403
 2. Store your .env file securely and do not commit it to version control.
+
+### Comments
+
+During the testing development, I realised that there are some erors in the status code responses for some endpoints,
+the ones that are actually failing
